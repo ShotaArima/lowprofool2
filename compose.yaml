@@ -3,10 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    platform: linux/amd64
     volumes:
       - ./src:/src
     ports:
       - "9004:9004"
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 8G
     environment:
-      - JUPYTER_ENEBLE_LAB=yes
-    command: ["jupyter", "notebook", "--ip=0.0.0.0", "--port=9004", "--allow-root", "--no-browser", "--NotebookApp.password=' argon2:$$argon2id$$v=19$$m=10240,t=10,p=8$$f+ZQrIEjs8xuiBD7i22zWQ$$X3FjYyolj3kuzs6zQ512NpuazlLvUaIFQgVSD0YRcXI '"]
+      - JUPYTER_ENABLE_LAB=yes
+      - HASHED_PASSWORD=
+      - EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=1
+#      - PYTHONMEMORY = 8G
+    command:
+      - bash
+      - -xc
+      - eval "$(pyenv init --path)" && eval "$(pyenv init -)" && jupyter notebook --ip=0.0.0.0 --port=9004 --allow-root --no-browser --NotebookApp.password=$$HASHED_PASSWORD
